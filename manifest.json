@@ -1,0 +1,10 @@
+{
+    "id": "tianlex",
+    "name": "TianLex",
+    "version": "1.0.0",
+    "minAppVersion": "1.8.0",
+    "description": "A local AI English dictionary powered by Ollama and LangChain, with translation, IPA, pronunciation, examples, favorites, history, and caching.",
+    "author": "tianzhen",
+    "authorUrl": "https://github.com/你的GitHub用户名",
+    "isDesktopOnly": true
+}

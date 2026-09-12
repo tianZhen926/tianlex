@@ -1,0 +1,380 @@
+/* ========================================
+   Translator Modal
+======================================== */
+
+.translator-modal {
+    width: 460px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 12px 8px;
+}
+
+
+/* ========================================
+   原文
+======================================== */
+
+.translator-word {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+
+    width: 100%;
+
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 600;
+
+    margin-bottom: 12px;
+}
+
+.translator-word > span:nth-child(2) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.translator-label {
+    flex-shrink: 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* ========================================
+   收藏按钮
+======================================== */
+
+.translator-favorite {
+    flex-shrink: 0;
+
+    margin-left: 14px;
+
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none !important;
+    border-radius: 6px;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    opacity: 0.6;
+
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease,
+        opacity 0.12s ease,
+        transform 0.08s ease;
+}
+
+.translator-favorite:hover {
+    background: var(--background-modifier-hover) !important;
+    color: var(--text-normal);
+
+    opacity: 1;
+}
+
+.translator-favorite:active {
+    background: var(--background-modifier-active-hover) !important;
+
+    transform: scale(0.88);
+
+    opacity: 1;
+}
+
+
+/* ========================================
+   英美音标
+======================================== */
+
+.translator-pronunciation {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 12px;
+}
+
+.translator-pronunciation-row {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
+    min-height: 28px;
+}
+
+.translator-region {
+    flex-shrink: 0;
+
+    width: 22px;
+
+    margin-right: 4px;
+
+    color: var(--text-accent);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.translator-ipa {
+    color: var(--text-muted);
+
+    font-size: 15px;
+
+    margin-right: 2px;
+}
+
+
+/* ========================================
+   喇叭 / 复制按钮
+======================================== */
+
+.translator-icon-button,
+.translator-copy-icon,
+.translator-example-play {
+    flex-shrink: 0;
+
+    width: 26px;
+    height: 26px;
+
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none !important;
+    border-radius: 6px;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    color: var(--text-muted);
+
+    cursor: pointer;
+
+    opacity: 0.55;
+
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease,
+        opacity 0.12s ease,
+        transform 0.08s ease;
+}
+
+
+/* 鼠标悬浮 */
+
+.translator-icon-button:hover,
+.translator-copy-icon:hover,
+.translator-example-play:hover {
+    background: var(--background-modifier-hover) !important;
+
+    color: var(--text-normal);
+
+    opacity: 1;
+}
+
+
+/* 鼠标点击 */
+
+.translator-icon-button:active,
+.translator-copy-icon:active,
+.translator-example-play:active {
+    background: var(--background-modifier-active-hover) !important;
+
+    transform: scale(0.88);
+
+    opacity: 1;
+}
+
+
+/* ========================================
+   复制按钮
+======================================== */
+
+.translator-copy-icon {
+    width: 24px;
+    height: 24px;
+
+    margin-left: 4px;
+
+    font-size: 12px;
+}
+
+
+/* ========================================
+   词性
+======================================== */
+
+.translator-pos {
+    display: inline-block;
+
+    padding: 2px 8px;
+
+    margin: 2px 0 14px;
+
+    border-radius: 5px;
+
+    background: var(--background-secondary);
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* ========================================
+   分割线
+======================================== */
+
+.translator-divider {
+    width: 100%;
+    height: 1px;
+
+    margin: 14px 0;
+
+    background: var(--background-modifier-border);
+}
+
+
+/* ========================================
+   中文翻译
+======================================== */
+
+.translator-translation {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    width: 100%;
+
+    gap: 4px;
+
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   例句标题
+======================================== */
+
+.translator-section-title {
+    margin: 0 0 8px;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   例句
+======================================== */
+
+.translator-example {
+    padding: 10px 12px;
+
+    margin-bottom: 6px;
+
+    border-radius: 8px;
+
+    background: var(--background-secondary);
+}
+
+.translator-example-en {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 6px;
+
+    line-height: 1.5;
+}
+
+.translator-example-en > span {
+    flex: 1;
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+}
+
+.translator-example-play {
+    width: 26px;
+    height: 26px;
+}
+
+.translator-example-cn {
+    margin-top: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* ========================================
+   历史记录 / 收藏夹
+======================================== */
+
+.translator-history-item {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 11px 13px;
+
+    margin-bottom: 8px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    background: var(--background-secondary);
+
+    transition:
+        background-color 0.12s ease;
+}
+
+.translator-history-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.translator-history-item strong {
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+.translator-history-item div {
+    color: var(--text-muted);
+
+    line-height: 1.5;
+}
+
+
+/* ========================================
+   设置页
+======================================== */
+
+.translator-setting-desc {
+    color: var(--text-muted);
+}
