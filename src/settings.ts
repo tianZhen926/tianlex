@@ -73,7 +73,7 @@ export class TranslatorSettingTab
         // ================================
 
         new Setting(containerEl)
-			.setName('TianLex')
+			.setName('Dictionary')
 			.setHeading();
 
 
