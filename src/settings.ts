@@ -33,7 +33,7 @@ export interface TranslatorSettings {
 }
 
 export const DEFAULT_SETTINGS: TranslatorSettings = {
-    model: 'qwen2.5:7b',
+    model: 'ali6parmak/hy-mt1.5:1.8b',
 
     targetLanguage: '中文',
 

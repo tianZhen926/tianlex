@@ -48,7 +48,7 @@
    收藏按钮
 ======================================== */
 
-.translator-favorite {
+.modal .translator-favorite {
     flex-shrink: 0;
 
     margin-left: 14px;
@@ -62,11 +62,11 @@
     align-items: center;
     justify-content: center;
 
-    border: none !important;
+    border: 0;
     border-radius: 6px;
 
-    background: transparent !important;
-    box-shadow: none !important;
+    background: transparent;
+    box-shadow: none;
 
     color: var(--text-muted);
 
@@ -83,15 +83,15 @@
         transform 0.08s ease;
 }
 
-.translator-favorite:hover {
-    background: var(--background-modifier-hover) !important;
+.modal .translator-favorite:hover {
+    background: var(--background-modifier-hover);
     color: var(--text-normal);
 
     opacity: 1;
 }
 
-.translator-favorite:active {
-    background: var(--background-modifier-active-hover) !important;
+.modal .translator-favorite:active {
+    background: var(--background-modifier-active-hover);
 
     transform: scale(0.88);
 
@@ -147,9 +147,9 @@
    喇叭 / 复制按钮
 ======================================== */
 
-.translator-icon-button,
-.translator-copy-icon,
-.translator-example-play {
+.modal .translator-icon-button,
+.modal .translator-copy-icon,
+.modal .translator-example-play {
     flex-shrink: 0;
 
     width: 26px;
@@ -161,11 +161,11 @@
     align-items: center;
     justify-content: center;
 
-    border: none !important;
+    border: 0;
     border-radius: 6px;
 
-    background: transparent !important;
-    box-shadow: none !important;
+    background: transparent;
+    box-shadow: none;
 
     color: var(--text-muted);
 
@@ -183,10 +183,10 @@
 
 /* 鼠标悬浮 */
 
-.translator-icon-button:hover,
-.translator-copy-icon:hover,
-.translator-example-play:hover {
-    background: var(--background-modifier-hover) !important;
+.modal .translator-icon-button:hover,
+.modal .translator-copy-icon:hover,
+.modal .translator-example-play:hover {
+    background: var(--background-modifier-hover);
 
     color: var(--text-normal);
 
@@ -196,10 +196,10 @@
 
 /* 鼠标点击 */
 
-.translator-icon-button:active,
-.translator-copy-icon:active,
-.translator-example-play:active {
-    background: var(--background-modifier-active-hover) !important;
+.modal .translator-icon-button:active,
+.modal .translator-copy-icon:active,
+.modal .translator-example-play:active {
+    background: var(--background-modifier-active-hover);
 
     transform: scale(0.88);
 
@@ -211,7 +211,7 @@
    复制按钮
 ======================================== */
 
-.translator-copy-icon {
+.modal .translator-copy-icon {
     width: 24px;
     height: 24px;
 
@@ -316,7 +316,7 @@
     overflow-wrap: anywhere;
 }
 
-.translator-example-play {
+.modal .translator-example-play {
     width: 26px;
     height: 26px;
 }
@@ -377,4 +377,127 @@
 
 .translator-setting-desc {
     color: var(--text-muted);
+}
+/* ========================================
+   弹窗语音设置
+======================================== */
+
+.translator-speech-settings {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin-top: 14px;
+    padding-top: 10px;
+
+    border-top: 1px solid
+        var(--background-modifier-border);
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.translator-speech-label {
+    flex-shrink: 0;
+
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.translator-speech-voice-label {
+    margin-left: 10px;
+}
+
+.translator-speech-select {
+    height: 28px;
+    min-width: 68px;
+
+    padding: 2px 24px 2px 8px;
+
+    border: 1px solid
+        var(--background-modifier-border);
+
+    border-radius: 6px;
+
+    background:
+        var(--background-secondary);
+
+    color:
+        var(--text-normal);
+
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+
+    transition:
+        border-color 0.12s ease,
+        background-color 0.12s ease;
+}
+
+.translator-speech-select:hover {
+    border-color:
+        var(--interactive-accent);
+}
+
+.translator-speech-select:focus {
+    border-color:
+        var(--interactive-accent);
+}
+
+/* ========================================
+   翻译取消按钮
+======================================== */
+
+.notice .tianlex-cancel-button {
+    flex-shrink: 0;
+
+    margin-left: 10px;
+    padding: 4px 11px;
+
+    min-width: 72px;
+    height: 28px;
+
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+
+    background: var(--background-secondary);
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow: none;
+
+    transition:
+        background-color 0.12s ease,
+        border-color 0.12s ease,
+        color 0.12s ease,
+        transform 0.08s ease,
+        box-shadow 0.12s ease;
+}
+
+.notice .tianlex-cancel-button:hover {
+    background: var(--background-modifier-hover);
+    border-color: var(--interactive-accent);
+    color: var(--text-normal);
+
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.notice .tianlex-cancel-button:active {
+    transform: scale(0.94);
+
+    background: var(--background-modifier-active-hover);
+    box-shadow: none;
+}
+
+.notice .tianlex-cancel-button:focus-visible {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
 }

@@ -27,11 +27,15 @@ export default class TianLexPlugin extends Plugin {
 
     settings!: TranslatorSettings;
 
-    cache: Record<string, DictionaryResult> = {};
+	cache: Record<string, DictionaryResult> = {};
 
-    history: HistoryItem[] = [];
+	history: HistoryItem[] = [];
 
-    favorites: Record<string, DictionaryResult> = {};
+	favorites: Record<string, DictionaryResult> = {};
+
+	isTranslating = false;
+
+	translationAbortController: AbortController | null = null;
 
 
     // ================================
@@ -94,6 +98,22 @@ export default class TianLexPlugin extends Plugin {
 
         await this.loadPluginData();
 
+		if (
+			typeof speechSynthesis !==
+			'undefined'
+		) {
+			speechSynthesis.getVoices();
+
+			speechSynthesis.addEventListener(
+				'voiceschanged',
+				() => {
+					speechSynthesis.getVoices();
+				},
+				{
+					once: true,
+				},
+			);
+		}
         // ================================
         // 设置页面
         // ================================
@@ -181,47 +201,92 @@ export default class TianLexPlugin extends Plugin {
                 }
 
 
-                try {
+                if (this.isTranslating) {
+					new Notice('正在查询，请稍候');
+					return;
+				}
 
-                    new Notice(
-                        '正在查询...',
-                    );
+				this.isTranslating = true;
+				this.translationAbortController =
+					new AbortController();
 
+				const controller =
+					this.translationAbortController;
 
-                    const result =
-                        await translateText(
-                            this,
-                            text,
-                        );
+				try {
 
+					const notice =
+						new Notice(
+							'正在查询...',
+							0,
+						);
 
+					const cancelButton =
+						notice.noticeEl.createEl(
+							'button',
+							{
+								text: '取消翻译',
+								cls: 'tianlex-cancel-button',
+							},
+						);
 
+					cancelButton.onclick = () => {
 
-                    const modal =
-                        new TranslationModal(
-                            this.app,
-                            text,
-                            result,
-                            this,
-                        );
+						controller.abort();
 
+						notice.hide();
 
-                    modal.open();
+						new Notice(
+							'已取消翻译',
+						);
+					};
 
-                } catch (error) {
+					const result =
+						await translateText(
+							this,
+							text,
+							controller.signal,
+						);
 
-                    console.error(
-                        '翻译失败:',
-                        error,
-                    );
+					notice.hide();
 
+					const modal =
+						new TranslationModal(
+							this.app,
+							text,
+							result,
+							this,
+						);
 
-                    new Notice(
-                        error instanceof Error
-                            ? error.message
-                            : '翻译失败',
-                    );
-                }
+					modal.open();
+
+				} catch (error) {
+
+					if (
+						error instanceof DOMException &&
+						error.name === 'AbortError'
+					) {
+						return;
+					}
+
+					console.error(
+						'翻译失败:',
+						error,
+					);
+
+					new Notice(
+						error instanceof Error
+							? error.message
+							: '翻译失败',
+					);
+
+				} finally {
+
+					this.isTranslating = false;
+
+					this.translationAbortController =
+						null;
+				}
             },
         });
 
@@ -681,6 +746,104 @@ class TranslationModal extends Modal {
                         'translator-example-cn',
                 });
             }
+			// ================================
+			// 语音设置
+			// ================================
+
+			const speechSettings =
+				container.createDiv({
+					cls: 'translator-speech-settings',
+				});
+
+			speechSettings.createSpan({
+				text: '语速',
+				cls: 'translator-speech-label',
+			});
+
+			const rateSelect =
+				speechSettings.createEl('select', {
+					cls: 'translator-speech-select',
+				});
+
+			const rateOptions = [
+				{ value: '0.6', label: '0.6x' },
+				{ value: '0.7', label: '0.7x' },
+				{ value: '0.8', label: '0.8x' },
+				{ value: '0.9', label: '0.9x' },
+				{ value: '1.0', label: '1.0x' },
+				{ value: '1.1', label: '1.1x' },
+				{ value: '1.2', label: '1.2x' },
+				{ value: '1.3', label: '1.3x' },
+			];
+
+			for (const option of rateOptions) {
+				rateSelect.createEl('option', {
+					value: option.value,
+					text: option.label,
+				});
+			}
+
+			rateSelect.value =
+				String(this.plugin.settings.speechRate);
+
+			rateSelect.onchange = async () => {
+				this.plugin.settings.speechRate =
+					Number(rateSelect.value);
+
+				await this.plugin.saveSettings();
+			};
+
+
+			speechSettings.createSpan({
+				text: '音色',
+				cls:
+					'translator-speech-label translator-speech-voice-label',
+			});
+
+			const voiceSelect =
+				speechSettings.createEl('select', {
+					cls: 'translator-speech-select',
+				});
+
+			const voices =
+				typeof speechSynthesis !== 'undefined'
+					? speechSynthesis.getVoices()
+					: [];
+
+			const englishVoices =
+				voices.filter(
+					voice =>
+						voice.lang.startsWith('en'),
+				);
+
+			const voiceNames =
+				[...new Set(
+					englishVoices.map(
+						voice => voice.name,
+					),
+				)];
+
+			if (!voiceNames.includes('Samantha')) {
+				voiceNames.unshift('Samantha');
+			}
+
+			for (const voiceName of voiceNames) {
+				voiceSelect.createEl('option', {
+					value: voiceName,
+					text: voiceName,
+				});
+			}
+
+			voiceSelect.value =
+				this.plugin.settings.voiceName ||
+				'Samantha';
+
+			voiceSelect.onchange = async () => {
+				this.plugin.settings.voiceName =
+					voiceSelect.value;
+
+				await this.plugin.saveSettings();
+			};
         }
     }
 
@@ -802,10 +965,9 @@ class TranslationModal extends Modal {
     // 语音
     // ================================
 
-    private async speak(
+    private speak(
 		text: string,
 	) {
-
 		if (
 			typeof speechSynthesis ===
 			'undefined'
@@ -819,41 +981,8 @@ class TranslationModal extends Modal {
 
 		speechSynthesis.cancel();
 
-
-		// ================================
-		// 等待系统语音加载
-		// ================================
-
-		let voices =
+		const voices =
 			speechSynthesis.getVoices();
-
-		if (!voices.length) {
-
-			voices =
-				await new Promise<
-					SpeechSynthesisVoice[]
-				>((resolve) => {
-
-					const handler = () => {
-
-						speechSynthesis
-							.removeEventListener(
-								'voiceschanged',
-								handler,
-							);
-
-						resolve(
-							speechSynthesis.getVoices(),
-						);
-					};
-
-					speechSynthesis
-						.addEventListener(
-							'voiceschanged',
-							handler,
-						);
-				});
-		}
 
 
 		// ================================
@@ -872,28 +1001,27 @@ class TranslationModal extends Modal {
 
 		utterance.volume = 1;
 
+		utterance.lang = 'en-US';
+
 
 		// ================================
-		// 强制寻找 Samantha
+		// 优先使用 Samantha
 		// ================================
 
-		const samantha =
+		const selectedVoice =
 			voices.find(
 				(voice) =>
-					voice.name === 'Samantha' &&
-					voice.lang === 'en-US',
+					voice.name ===
+					this.plugin.settings.voiceName,
 			);
 
-
-		if (samantha) {
+		if (selectedVoice) {
 
 			utterance.voice =
-				samantha;
+				selectedVoice;
 
 			utterance.lang =
-				'en-US';
-
-
+				selectedVoice.lang;
 
 		} else {
 
@@ -909,24 +1037,31 @@ class TranslationModal extends Modal {
 					fallback;
 
 				utterance.lang =
-					'en-US';
-
-				console.warn(
-					'没有找到 Samantha，使用:',
-					fallback.name,
-					fallback.lang,
-				);
+					fallback.lang;
 
 			} else {
 
 				utterance.lang =
 					'en-US';
-
-				console.warn(
-					'没有找到 Samantha 或 en-US 语音',
-				);
 			}
 		}
+
+
+
+
+
+		// ================================
+		// 播放错误
+		// ================================
+
+		utterance.onerror =
+			(event) => {
+
+				console.error(
+					'TianLex 语音播放失败:',
+					event.error,
+				);
+			};
 
 
 		speechSynthesis.speak(

@@ -1,227 +1,230 @@
-import { ChatOllama } from '@langchain/ollama';
-import { z } from 'zod';
+import {ChatOllama} from '@langchain/ollama';
+import {z} from 'zod';
 
 import type TianLexPlugin from './main';
 import {
-    saveCache,
-    saveHistory,
+	saveCache,
+	saveHistory,
 } from './storage';
 import type {
-    DictionaryResult,
+	DictionaryResult,
 } from './settings';
 
 
 const resultSchema = z.object({
 
-    translation:
-        z.string()
-            .describe(
-                '翻译结果',
-            ),
+	translation:
+		z.string()
+			.describe(
+				'翻译结果',
+			),
 
-    ukIpa:
-        z.string()
-            .describe(
-                '英式英语 IPA 国际音标',
-            ),
+	ukIpa:
+		z.string()
+			.describe(
+				'英式英语 IPA 国际音标',
+			),
 
-    usIpa:
-        z.string()
-            .describe(
-                '美式英语 IPA 国际音标',
-            ),
+	usIpa:
+		z.string()
+			.describe(
+				'美式英语 IPA 国际音标',
+			),
 
-    partOfSpeech:
-        z.string()
-            .describe(
-                '英文词性，例如 noun、verb、adjective',
-            ),
+	partOfSpeech:
+		z.string()
+			.describe(
+				'英文词性，例如 noun、verb、adjective',
+			),
 
-    examples:
-        z.array(
-            z.object({
+	examples:
+		z.array(
+			z.object({
 
-                english:
-                    z.string(),
+				english:
+					z.string(),
 
-                chinese:
-                    z.string(),
+				chinese:
+					z.string(),
 
-            }),
-        )
-        .max(3)
-        .describe(
-            '最多三个实用例句',
-        ),
+			}),
+		)
+			.max(3)
+			.describe(
+				'最多三个实用例句',
+			),
 });
+
 function cleanIpa(ipa: string): string {
-    const value = ipa
-        .trim()
-        .replace(/^```(?:text)?/i, '')
-        .replace(/```$/i, '')
-        .replace(/[*_`]/g, '')
-        .trim();
+	const value = ipa
+		.trim()
+		.replace(/^```(?:text)?/i, '')
+		.replace(/```$/i, '')
+		.replace(/[*_`]/g, '')
+		.trim();
 
-    if (value.includes('�')) {
-        return '暂无音标';
-    }
+	if (value.includes('�')) {
+		return '暂无音标';
+	}
 
-    return value;
+	return value;
 }
 
 export async function translateText(
     plugin: TianLexPlugin,
     text: string,
+    signal?: AbortSignal,
 ): Promise<DictionaryResult> {
 
-    const start = Date.now();
+	const start = Date.now();
 
-    const input =
-        text.trim();
+	const input =
+		text.trim();
 
-    if (!input) {
-        throw new Error(
-            '翻译文本不能为空',
-        );
-    }
-
-
-    // ================================
-    // 缓存
-    // ================================
-
-    const cacheKey =
-        `${plugin.settings.targetLanguage}::${input.toLowerCase()}`;
+	if (!input) {
+		throw new Error(
+			'翻译文本不能为空',
+		);
+	}
 
 
-    const cached =
-    	plugin.cache[cacheKey];
+	// ================================
+	// 缓存
+	// ================================
+
+	const cacheKey =
+		`${plugin.settings.targetLanguage}::${input.toLowerCase()}`;
 
 
-    if (cached) {
-
-        console.log(
-            '命中翻译缓存:',
-            input,
-        );
-
-        return cached;
-    }
+	const cached =
+		plugin.cache[cacheKey];
 
 
-    // ================================
-    // Ollama
-    // ================================
+	if (cached) {
 
-    const model =
-        new ChatOllama({
-            model:
-                plugin.settings.model,
+		console.log(
+			'命中翻译缓存:',
+			input,
+		);
 
-            temperature:
-                0,
-
-            baseUrl:
-                'http://localhost:11434',
-        });
+		return cached;
+	}
 
 
-    const structuredModel =
-        model.withStructuredOutput(
-            resultSchema,
-        );
+	// ================================
+	// Ollama
+	// ================================
+
+	const model =
+		new ChatOllama({
+			model:
+			plugin.settings.model,
+
+			temperature:
+				0,
+
+			baseUrl:
+				'http://localhost:11434',
+		});
 
 
-    const result =
-        await structuredModel.invoke([
-
-            {
-                role: 'system',
-
-                content:
-`You are a professional English dictionary assistant.
-
-Analyze the user's English input.
-
-Target language:
-${plugin.settings.targetLanguage}
-
-Return:
-1. A natural translation.
-2. British English IPA.
-3. American English IPA.
-4. Part of speech.
-5. Up to 3 useful example sentences.
-
-Rules:
-- For a single word, give the common pronunciation.
-- For a phrase, give the pronunciation of the phrase.
-- For a sentence, provide the pronunciation of the sentence.
-- Use standard IPA only.
-- Return IPA enclosed in / /.
-- Do not use Markdown.
-- Do not use Chinese characters inside IPA.
-- Do not output replacement characters such as �.
-- If British and American pronunciation are the same, return the same IPA.
-- Examples must be useful and natural.
-- Chinese translations should sound natural rather than literal.`,
-            },
-
-            {
-                role: 'user',
-
-                content:
-                    input,
-            },
-        ]);
+	const structuredModel =
+		model.withStructuredOutput(
+			resultSchema,
+		);
 
 
-    console.log(
-        'LangChain Ollama耗时:',
-        Date.now() - start,
-        'ms',
-    );
+	const result =
+		await structuredModel.invoke(
+			[
+				{
+					role: 'system',
+					content: `You are a professional English dictionary assistant.
+	
+	Analyze the user's English input.
+	
+	Target language:
+	${plugin.settings.targetLanguage}
+	
+	Return:
+	1. A natural translation.
+	2. British English IPA.
+	3. American English IPA.
+	4. Part of speech.
+	5. Up to 3 useful example sentences.
+	
+	Rules:
+	- For a single word, give the common pronunciation.
+	- For a phrase, give the pronunciation of the phrase.
+	- For a sentence, provide the pronunciation of the sentence.
+	- Use standard IPA only.
+	- Return IPA enclosed in / /.
+	- Do not use Markdown.
+	- Do not use Chinese characters inside IPA.
+	- Do not output replacement characters such as �.
+	- If British and American pronunciation are the same, return the same IPA.
+	- Examples must be useful and natural.
+	- Chinese translations should sound natural rather than literal.`,
+				},
+				{
+					role: 'user',
+					content: input,
+				},
+			],
+			{
+				signal:
+					signal ??
+					AbortSignal.timeout(60_000),
+			},
+		);
 
 
-    console.log(
-        '结构化结果:',
-        result,
-    );
+	console.log(
+		'LangChain Ollama耗时:',
+		Date.now() - start,
+		'ms',
+	);
 
 
-    const dictionaryResult: DictionaryResult = {
-
-        translation:
-            result.translation.trim(),
-
-        ukIpa:
-            cleanIpa(result.ukIpa),
-
-        usIpa:
-            cleanIpa(result.usIpa),
-
-        partOfSpeech:
-            result.partOfSpeech.trim(),
-
-        examples:
-            result.examples.map(
-                (example) => ({
-                    english:
-                        example.english.trim(),
-
-                    chinese:
-                        example.chinese.trim(),
-                }),
-            ),
-    };
+	console.log(
+		'结构化结果:',
+		result,
+	);
 
 
-    // ================================
-    // 保存缓存
-    // ================================
+	const dictionaryResult: DictionaryResult = {
 
-    plugin.cache[cacheKey] =
-    dictionaryResult;
+		translation:
+			result.translation.trim(),
+
+		ukIpa:
+			cleanIpa(result.ukIpa),
+
+		usIpa:
+			cleanIpa(result.usIpa),
+
+		partOfSpeech:
+			result.partOfSpeech.trim(),
+
+		examples:
+			result.examples.map(
+				(example) => ({
+					english:
+						example.english.trim(),
+
+					chinese:
+						example.chinese.trim(),
+				}),
+			),
+	};
+
+
+	// ================================
+	// 保存缓存
+	// ================================
+
+	plugin.cache[cacheKey] =
+		dictionaryResult;
 
 	await saveCache(
 		plugin,
@@ -229,27 +232,27 @@ Rules:
 	);
 
 
-    // ================================
-    // 保存历史
-    // ================================
+	// ================================
+	// 保存历史
+	// ================================
 
-    plugin.history.unshift({
-			text: input,
-			result: dictionaryResult,
-			timestamp: Date.now(),
-		});
+	plugin.history.unshift({
+		text: input,
+		result: dictionaryResult,
+		timestamp: Date.now(),
+	});
 
-		plugin.history =
-			plugin.history.slice(0, 100);
+	plugin.history =
+		plugin.history.slice(0, 100);
 
-		await saveHistory(
-			plugin,
-			plugin.history,
-		);
-
-
-    await plugin.saveSettings();
+	await saveHistory(
+		plugin,
+		plugin.history,
+	);
 
 
-    return dictionaryResult;
+	await plugin.saveSettings();
+
+
+	return dictionaryResult;
 }

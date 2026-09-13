@@ -27,7 +27,7 @@ Select English text in Obsidian to quickly view its Chinese translation, British
 For example:
 
 ```bash
-ollama pull qwen2.5:7b
+ollama pull ali6parmak/hy-mt1.5:1.8b
 ```
 Usage
 
