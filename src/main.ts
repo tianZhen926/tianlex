@@ -23,7 +23,7 @@ import {
 } from './translator';
 
 
-export default class TranslatorPlugin extends Plugin {
+export default class TianLexPlugin extends Plugin {
 
     settings!: TranslatorSettings;
 
@@ -93,11 +93,6 @@ export default class TranslatorPlugin extends Plugin {
         await this.loadSettings();
 
         await this.loadPluginData();
-
-        console.log(
-            'Translator Plugin 已加载',
-        );
-
 
         // ================================
         // 设置页面
@@ -200,10 +195,6 @@ export default class TranslatorPlugin extends Plugin {
                         );
 
 
-                    console.log(
-                        '词典结果:',
-                        result,
-                    );
 
 
                     const modal =
@@ -294,9 +285,6 @@ export default class TranslatorPlugin extends Plugin {
             speechSynthesis.cancel();
         }
 
-        console.log(
-            'Translator Plugin 已卸载',
-        );
     }
 }
 
@@ -311,7 +299,7 @@ class TranslationModal extends Modal {
 
     result: DictionaryResult;
 
-    plugin: TranslatorPlugin;
+    plugin: TianLexPlugin;
 
     isFavorite = false;
 
@@ -320,7 +308,7 @@ class TranslationModal extends Modal {
         app: any,
         original: string,
         result: DictionaryResult,
-        plugin: TranslatorPlugin,
+        plugin: TianLexPlugin,
     ) {
 
         super(app);
@@ -905,11 +893,7 @@ class TranslationModal extends Modal {
 			utterance.lang =
 				'en-US';
 
-			console.log(
-				'使用语音:',
-				samantha.name,
-				samantha.lang,
-			);
+
 
 		} else {
 
@@ -972,12 +956,12 @@ class TranslationModal extends Modal {
 
 class HistoryModal extends Modal {
 
-    plugin: TranslatorPlugin;
+    plugin: TianLexPlugin;
 
 
     constructor(
         app: any,
-        plugin: TranslatorPlugin,
+        plugin: TianLexPlugin,
     ) {
 
         super(app);
@@ -1079,12 +1063,12 @@ class HistoryModal extends Modal {
 
 class FavoritesModal extends Modal {
 
-    plugin: TranslatorPlugin;
+    plugin: TianLexPlugin;
 
 
     constructor(
         app: any,
-        plugin: TranslatorPlugin,
+        plugin: TianLexPlugin,
     ) {
 
         super(app);

@@ -3,8 +3,7 @@ import {
     Setting,
     requestUrl,
 } from 'obsidian';
-
-import type TranslatorPlugin from './main';
+import type TianLexPlugin from './main';
 import {saveCache, saveFavorites, saveHistory} from "./storage";
 
 export interface ExampleSentence {
@@ -48,11 +47,11 @@ export const DEFAULT_SETTINGS: TranslatorSettings = {
 export class TranslatorSettingTab
     extends PluginSettingTab {
 
-    plugin: TranslatorPlugin;
+    plugin: TianLexPlugin;
 
     constructor(
         app: any,
-        plugin: TranslatorPlugin,
+        plugin: TianLexPlugin,
     ) {
         super(app, plugin);
 
@@ -73,12 +72,9 @@ export class TranslatorSettingTab
         // 标题
         // ================================
 
-        containerEl.createEl(
-            'h2',
-            {
-                text: 'Translator',
-            },
-        );
+        new Setting(containerEl)
+			.setName('TianLex')
+			.setHeading();
 
 
         containerEl.createEl(

@@ -1,7 +1,7 @@
 import { ChatOllama } from '@langchain/ollama';
 import { z } from 'zod';
 
-import type TranslatorPlugin from './main';
+import type TianLexPlugin from './main';
 import {
     saveCache,
     saveHistory,
@@ -70,7 +70,7 @@ function cleanIpa(ipa: string): string {
 }
 
 export async function translateText(
-    plugin: TranslatorPlugin,
+    plugin: TianLexPlugin,
     text: string,
 ): Promise<DictionaryResult> {
 
